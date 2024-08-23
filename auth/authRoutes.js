@@ -250,7 +250,17 @@ router.post('/user-login', async (req, res) => {
 
 
 
+/////// setup multer for storage
+const storage = multer.diskStorage({
+    destination : (req,file, cb) =>{
+        cb(null, "uploads/");
+    },
+    filename: (req, file, cb) =>{
+        cb(null, `${Date.now()}-${file.originalname}`);
+    },
+});
 
+const upload = multer({ storage : storage });
 
 
 
@@ -263,11 +273,17 @@ router.post('/user-login', async (req, res) => {
 
 //////// create a new article v3
 router.post('/create-new-article', authMiddelware, reporterMiddeleware, async (req, res) => {
-    const { articleType, newsHeading, newsDescription, newsDescriptionLong, city, country, coverImage, publicationType } = req.body;
+    const { articleType, newsHeading, newsDescription, newsDescriptionLong, city, country } = req.body;
+    const publicationType = parseInt(req.body.publicationType, 10);
+    const coverImage = req.file ? req.file.path : null;
 
     /////// Validate Publication TYpe
     if (![0, 1, 2].includes(publicationType)) {
         return res.status(400).json({ error: 'Inavlid publication Type' });
+    }
+
+    if(!coverImage){
+        return res.status(400).json({ error: 'Cover Image is required' });
     }
 
     try {

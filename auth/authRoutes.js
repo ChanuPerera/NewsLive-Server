@@ -263,11 +263,25 @@ const storage = multer.diskStorage({
 const upload = multer({ storage : storage });
 
 
+
+// Set up multer to save files in the React project directory
+// const storage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//         cb(null, path.join(__dirname, '../NewsLive-Client/uploads')); // Adjust the path to your React project's public/uploads folder
+//     },
+//     filename: (req, file, cb) => {
+//         cb(null, Date.now() + '-' + file.originalname);
+//     }
+// });
+
+// const upload = multer({ storage });
+
+
 //////// create a new article v3
 router.post('/create-new-article', authMiddelware, reporterMiddeleware, upload.single('coverImage'), async (req, res) => {
     const { articleType, newsHeading, newsDescription, newsDescriptionLong, city, country } = req.body;
     const publicationType = parseInt(req.body.publicationType, 10);
-    const coverImage = req.file ? req.file.path : null;
+    const coverImage = req.file ? `uploads/${req.file.filename}` : null;
 
     if (![0, 1, 2].includes(publicationType)) {
         return res.status(400).json({ error: 'Invalid publication Type' });
@@ -286,7 +300,7 @@ router.post('/create-new-article', authMiddelware, reporterMiddeleware, upload.s
             newsDescriptionLong,
             city,
             country,
-            coverImage,
+            coverImage, 
             publicationType
         });
 

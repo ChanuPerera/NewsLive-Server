@@ -10,7 +10,6 @@ const reporterMiddeleware = async (req, res, next) => {
 
         const authUser = await AuthUser.findById(userId).populate('reporter');
        
-       
         if(authUser && authUser.roleType === 'reporter' && authUser.reporter)
         {
             req.reporter = authUser.reporter;

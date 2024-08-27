@@ -4,7 +4,7 @@ const port = process.env.PORT || 3001;
 const bodyparser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
-
+const fs = require('fs');
 
 app.use(bodyparser.json());
 
@@ -14,8 +14,16 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 
+// Ensure the uploads directory exists
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+
 // Serve static files from the /uploads directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(uploadDir));
+
+
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

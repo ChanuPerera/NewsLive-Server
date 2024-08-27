@@ -263,26 +263,17 @@ const storage = multer.diskStorage({
 const upload = multer({ storage : storage });
 
 
-
-
-
-
-  
-
-
-
 //////// create a new article v3
-router.post('/create-new-article', authMiddelware, reporterMiddeleware, async (req, res) => {
+router.post('/create-new-article', authMiddelware, reporterMiddeleware, upload.single('coverImage'), async (req, res) => {
     const { articleType, newsHeading, newsDescription, newsDescriptionLong, city, country } = req.body;
     const publicationType = parseInt(req.body.publicationType, 10);
     const coverImage = req.file ? req.file.path : null;
 
-    /////// Validate Publication TYpe
     if (![0, 1, 2].includes(publicationType)) {
-        return res.status(400).json({ error: 'Inavlid publication Type' });
+        return res.status(400).json({ error: 'Invalid publication Type' });
     }
 
-    if(!coverImage){
+    if (!coverImage) {
         return res.status(400).json({ error: 'Cover Image is required' });
     }
 
@@ -297,15 +288,11 @@ router.post('/create-new-article', authMiddelware, reporterMiddeleware, async (r
             country,
             coverImage,
             publicationType
-
         });
-        ////////////// save the article
+
         const savedArticle = await newArticle.save();
-        ///////////////////// update the reporter article list
-        req.reporter.articles.push(savedArticle._id)
+        req.reporter.articles.push(savedArticle._id);
         await req.reporter.save();
-
-
 
         if (publicationType === 2) {
             const newDraft = new Draft({
@@ -318,26 +305,22 @@ router.post('/create-new-article', authMiddelware, reporterMiddeleware, async (r
                 country,
                 coverImage,
                 publicationType
-
             });
 
             const savedDraft = await newDraft.save();
-
-            req.reporter.drafts.push(savedDraft._id)
+            req.reporter.drafts.push(savedDraft._id);
             await req.reporter.save();
 
             return res.status(201).json({ message: 'Draft Saved' });
         }
 
-        res.status(201).json({ message: 'Article Saved' , success: true });
-
-        // res.status(201).json(savedArticle);
+        res.status(201).json({ message: 'Article Saved', success: true });
     } catch (error) {
         console.error('Error creating article', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
-
 });
+
 
 
 

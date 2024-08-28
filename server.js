@@ -14,14 +14,18 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 
-// Ensure the uploads directory exists
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
-}
-
 // Serve static files from the /uploads directory
-app.use('/uploads', express.static(uploadDir));
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
+////// make sure to have the upload folder
+const uploadDir = path.join(__dirname, 'uploads');
+if(!fs.existsSync(uploadDir))
+{
+    fs.mkdirSync(uploadDir)
+};
+app.use('/uploads',express.static(uploadDir));
+
 
 
 

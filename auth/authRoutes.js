@@ -267,7 +267,7 @@ const upload = multer({ storage : storage });
 router.post('/create-new-article', authMiddelware, reporterMiddeleware, upload.single('coverImage'), async (req, res) => {
     const { articleType, newsHeading, newsDescription, newsDescriptionLong, city, country } = req.body;
     const publicationType = parseInt(req.body.publicationType, 10);
-    const coverImage = req.file ? req.file.path : null;
+    const coverImage = req.file ? `uploads/${req.file.filename}` : null;
 
     if (![0, 1, 2].includes(publicationType)) {
         return res.status(400).json({ error: 'Invalid publication Type' });
@@ -339,6 +339,11 @@ router.get('/fetch-articles' , async(req , res) => {
         res.status(500).json({error: 'Internal server Error'});
     }
 })
+
+
+
+
+
 
 
 

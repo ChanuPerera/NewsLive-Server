@@ -354,6 +354,59 @@ router.get('/fetch-articles' , async(req , res) => {
     }
 })
 
+///////////filter-articles v1
+
+// router.get('/filter-articles', async (req, res) => {
+//     const { type } = req.query; // Extract the article type from the query parameters
+
+//     try {
+//         // Fetch articles by the specified type
+//         const articles = await Article.find({ articleType: type }).sort({ publishedDate: -1 });
+
+//         res.status(200).json({ articles });
+//     } catch (error) {
+//         console.error('Error fetching articles by type:', error);
+//         res.status(500).json({ error: 'Internal Server Error' });
+//     }
+// });
+
+
+
+
+
+
+
+
+///////////filter-articles v2
+router.get('/filter-articles', async (req, res) => {
+    const { type } = req.query; // Extract the article type from the query parameters
+
+    try {
+        // Fetch articles by the specified type and populate the 'author' field with reporter details
+        const articles = await Article.find({ articleType: type })
+            .sort({ publishedDate: -1 })
+            .populate({
+                path: 'author',
+                select: 'firstName lastName' // Select only firstName and lastName fields
+            });
+
+        // Map the articles to include the full name of the author
+        const articlesWithAuthorNames = articles.map(article => ({
+            ...article._doc, // Spread the article document
+            author: `${article.author.firstName} ${article.author.lastName}` // Combine firstName and lastName
+        }));
+
+        res.status(200).json({ articles: articlesWithAuthorNames });
+    } catch (error) {
+        console.error('Error fetching articles by type:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+
+
+
 
 
 
